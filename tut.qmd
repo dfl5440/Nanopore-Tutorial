@@ -1,0 +1,29 @@
+---
+title: "Nanopore Computational Tutorial"
+author: "Diego Lera-Lozano, Vivian Yifan Li"
+format:
+  html:
+    theme: darkly
+    toc: true
+    toc-float: true
+    toc-depth: 5
+    df-print: paged
+    smooth-scroll: true
+    citations-hover: true
+editor: source  
+---
+
+# Intro
+
+
+
+# Basecalling
+
+### Installation
+
+In the tutorial we will use Oxford Nanopore's Basecaller Dorado to basecall the read
+
+# Quality Assessment + 
+
+
+

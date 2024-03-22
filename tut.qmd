@@ -1,6 +1,6 @@
 ---
 title: "Nanopore Computational Tutorial"
-author: "Diego Lera-Lozano, Vivian Yifan Li"
+author: "Diego Lera-Lozano and Vivian Yifan Li"
 format:
   html:
     theme: darkly
@@ -15,15 +15,125 @@ editor: source
 
 # Intro
 
+In this tutorial we hope to provide the Medina Lab a clear and concise guide on how to proceed with your freshly generated Oxford Nanopore data! In the guide we will cover the following:
 
+- Accessing you data and managing it
+- In house basecalling
+- Read quality control methods 
+- Future steps and additional Resources
+
+If at any point you run into unique issues and/or have any feedback regarding the tutorial feel free to reach out to either author. 
+
+# Data Managment
+
+To connect to the MinION from the command terminal: `ssh minit@<ipaddress>`
+
+- Medina minION IP address: 172.27.173.47
+- Password: minit
+
+To access your data navigate to the hidden data folder: `cd /data`
+
+Once you find your data you can begin to transfer your data off the MinION into Cassiopea (online backup):
+
+1. Compress the data folder into .tar.gz
+
+- `tar -czvf <folder_to_compress>.tar.gz <folder_to_compress>`
+- May take a couple hours depending on size of the folder
+
+2. Create an md5 hash of the source zip file
+
+- `md5sum <source_folder.tar.gz> > <source_folder.md5>`
+- May take an hour depending on size of the tarzip file
+
+3. Copy to Cassiopea
+
+- Connect to Cassiopea from browser (in bookmarks)
+- `scp -r minit@<ipaddress>:path_to_source /Volumes/MedinaLab/path_to_destination`
+- `rsync -avz minit@<ipaddress>:path_to_source /Volumes/MedinaLab/path_to_destination`
+
+4. Create md5 hash of the destination zip file
+
+- Make sure it is exactly the same as the one at the source
+
+5. Transfer data off the MinION into a hard drive (physical backup). Perform md5
+checksum.
+
+6. Transfer data(pod5 pass files) to Roar Collab or other working directory. Perform md5 checksum.
 
 # Basecalling
 
+At this point in the tutorial we assume that you have downloaded your pod5 pass files into a working directory in either Roar Collab or a lab server. At this point it is important to note why we do the basecalling ourselves rather then using the basecalled reads provided by the MinION. The reads provided by the MinION itself were basecalled using ONT's software Guppy. What we found when checking the quality of these reads is that Guppy did a poor to mediocre job of accurately calling each base due to this we decided to use a different basecalling software being ONT's Dorado. What we found was that the high accuracy model of Dorado produced amazingly high quality reads. Due to this we decided to proceed with Dorado.
+
 ### Installation
 
-In the tutorial we will use Oxford Nanopore's Basecaller Dorado to basecall the read
+1. Install Dorado 
 
-# Quality Assessment + 
+- Navigate to: https://github.com/nanoporetech/dorado/
+- Find the latest linux 64 installation: dorado-X.X.X-linux-x64
+- Copy link address then run the following in your programs folder: `wget copied/link/address/dorado-X.X.X-linux-x64.tar.gz`
+
+2. Model Installation
+
+- First decide on the the accuracy level of the model: fast, hac, sup(most accurate, takes the longest, highly recommended!)
+- Second determine you Chemistry type and Pore type which can both be found in your run log file produced by the MinION
+- Once determined find the respective model from the DNA model list on the github then download, for example: `path/to/dorado --model dna_r10.4.1_e8.2_400bps_sup@v4.3.0`
+
+### Basecalling (Diego's Method)
+
+1. Intial Script 
+
+- To begin I built the initial script `basecalling_barcode01_0.sh` that will be used for the base calling:
+
+```
+#!/bin/bash
+#SBATCH --job-name=B1R_0
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=24
+#SBATCH --time=24:00:00
+#SBATCH --mem=250G
+
+date
+
+#Variables
+export MODEL=dna_r10.4.1_e8.2_400bps_sup@v4.2.0
+export INDIR=barcode02/FAW85005_pass_barcode02_63d61123_4536b951_0.pod5
+export OUT=barcode01_reads_0.fastq.gz
+
+#Commands 
+dorado duplex -t $SLURM_NTASKS -x "cpu" --emit-fastq $MODEL $INDIR | gzip > $OUT
+
+date
+```
+- \-t flag represents the amount of threads we are using
+- \-x flag tells dorado to use cpus as we don’t have access to gpus on roar
+- \–emit-fastq tells dorado to produce fastq files
+- gzip > gzips our files
+
+2. Job Submission!
+
+- Due to several issues while attempting to create a job array, we settled on running several loops which submit each read file individually for basecalling:
+
+```
+for i in {0..99}; do echo $i; done
+for i in {0..99}; do cp basecalling_barcode01_0.sh basecalling_barcode01_${i}.sh; done
+for i in {0..99}; do sed -i "s/_0/_${i}/g" basecalling_barcode01_${i}.sh; done
+for i in {0..99}; do sbatch basecalling_barcode01_${i}.sh; done
+
+```
+
+- First the bounds of the loop should match the amount of the pod5 pass files you contain in a directory. 
+- The first for loop is a simple check to see if the loop is working. 
+- The second copies the original script until there is one script per pod5 files.
+- The third substitutes each _0 in a script with the number currently iterating in the loop
+- The final loop submits all jobs for the barcode.
+
+### Basecalling (Vivian's Method)
+
+
+
+# Quality Assessment 
+
+### FastQC
 
 
 

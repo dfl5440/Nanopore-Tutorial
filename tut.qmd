@@ -128,7 +128,7 @@ for i in {0..99}; do sbatch basecalling_barcode01_${i}.sh; done
 - The final loop submits all jobs for the barcode.
 
 ### Basecalling (Vivian's Method)
-
+blahblah blah
 
 
 # Quality Assessment 

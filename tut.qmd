@@ -80,7 +80,7 @@ At this point in the tutorial we assume that you have downloaded your pod5 pass 
 
 ### Basecalling (Diego's Method)
 
-1. Intial Script 
+1. Initial Script 
 
 - To begin I built the initial script `basecalling_barcode01_0.sh` that will be used for the base calling:
 
@@ -128,8 +128,6 @@ for i in {0..99}; do sbatch basecalling_barcode01_${i}.sh; done
 - The final loop submits all jobs for the barcode.
 
 ### Basecalling (Vivian's Method)
-
-
 
 # Quality Assessment 
 

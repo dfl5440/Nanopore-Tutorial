@@ -129,9 +129,7 @@ for i in {0..99}; do sbatch basecalling_barcode01_${i}.sh; done
 
 ### Basecalling (Vivian's Method)
 
-# Quality Assessment 
 
-### FastQC
 
 
 

@@ -13,23 +13,36 @@ format:
 editor: source  
 ---
 
-## Quarto
+# Quality Assessment
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+In this document we will look at assessing the quality of nanopore long reads using fastQC then looking at using chopper to trim either ends of the reads leaving us with high quality reads suitable for downstream analysis.
 
-## Running Code
+### FastQC
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+To begin we will generate a fastQC report, first we can load fastqc using Roar Collab's available modules. Then prior to generating the reports we have to concatenate all of the read files generated. Then gzip them. Then we can generate the report.
 
-```{r}
-1 + 1
-```
+- Concatenate: ` zcat *fastq.gz > barcode01_basecalled.fastq `
+- GZipping: `gzip barcode01_supbasecalled.fastq`
+- FastQC: `fastqc barcode01_supbasecalled.fastq.gz`
 
-You can add options to executable code like this
+The FastQC report has several sections but we will specifically be looking at the first four being Basic Statistics, Per base sequence quality, and Per base sequence content.
 
-```{r}
-#| echo: false
-2 * 2
-```
+- Basic Statistics: This section will provided you with basic data that may be important downstream.
+- Per base sequence quality: This section will show generated graphs assessing the quality of your reads. Here we are looking to have all of the yellow box plots above the 28 threshold. 
+- Per base sequence content: In this section we are looking to make sure that the percentage of coinciding nucleotides persist until towards the end of the graph.
 
-The `echo: false` option disables the printing of code (only output is displayed).
+Examples:
+
+-------------------------------------------------------------------
+
+![Image 1](dorado.png){width="49.2%"} | ![Image 2](BC1_trim.png){width="49.2%"}
+
+------------------------------------------------------------------------
+
+On the left we
+
+
+
+
+
+
